@@ -4,6 +4,25 @@
 /////////////////////////////////////////////////
 // BANKIST APP
 
+// Elements
+
+const mainEl = document.querySelector('.main');
+const footerEl = document.querySelector('.footer');
+const recordsContainer = document.querySelector('.section2__records-container');
+
+const mainBalance = document.querySelector('.section1__header-mainBalance');
+
+const depositeTotal = document.querySelector('.footer--information-in');
+
+const withdrawlTotal = document.querySelector('.footer--information-out');
+
+const interestTotal = document.querySelector('.footer--information-interest');
+
+const btnLogin = document.querySelector('.btn--login');
+const inputUsername = document.querySelector('.input--username');
+const inputPassword = document.querySelector('.input--password');
+
+const headerUserName = document.querySelector('.header--username');
 // Data
 const account1 = {
   owner: 'Jonas Schmedtmann',
@@ -35,32 +54,92 @@ const account4 = {
 
 const accounts = [account1, account2, account3, account4];
 
-// Elements
-const labelWelcome = document.querySelector('.welcome');
-const labelDate = document.querySelector('.date');
-const labelBalance = document.querySelector('.balance__value');
-const labelSumIn = document.querySelector('.summary__value--in');
-const labelSumOut = document.querySelector('.summary__value--out');
-const labelSumInterest = document.querySelector('.summary__value--interest');
-const labelTimer = document.querySelector('.timer');
+// Add New Movement to the Records
+const addNewMovement = function (movement) {
+  recordsContainer.innerHTML = '';
+  movement.forEach((element, i) => {
+    const type = element > 0 ? 'Deposit' : 'Withdrawl';
+    const html = `<li>
+  <div>
+    <p class="section2__records-transactionNumber">${
+      i + 1
+    } <span class="movement__type movement__type-${type}">${type}</span></p>
+    <p class="section2__records-transactionDate">02/22/2021</p>
+  </div>
 
-const containerApp = document.querySelector('.app');
-const containerMovements = document.querySelector('.movements');
+  <p class="section2__records-transactionAmount">$${element}</p>
+</li>`;
+    recordsContainer.insertAdjacentHTML('afterbegin', html);
+  });
+};
 
-const btnLogin = document.querySelector('.login__btn');
-const btnTransfer = document.querySelector('.form__btn--transfer');
-const btnLoan = document.querySelector('.form__btn--loan');
-const btnClose = document.querySelector('.form__btn--close');
-const btnSort = document.querySelector('.btn--sort');
+// Create Usernames
+const createUserName = accs => {
+  accs.forEach(element => {
+    element.userName = element.owner
+      .toLowerCase()
+      .split(' ')
+      .map(element => element.slice(0, 1))
+      .join('');
+  });
+};
 
-const inputLoginUsername = document.querySelector('.login__input--user');
-const inputLoginPin = document.querySelector('.login__input--pin');
-const inputTransferTo = document.querySelector('.form__input--to');
-const inputTransferAmount = document.querySelector('.form__input--amount');
-const inputLoanAmount = document.querySelector('.form__input--loan-amount');
-const inputCloseUsername = document.querySelector('.form__input--user');
-const inputClosePin = document.querySelector('.form__input--pin');
+// Display Total Balanace
+const calcDisplayBalance = function (movements) {
+  const newBalance = movements.reduce((acumm, value) => acumm + value);
+  mainBalance.innerHTML = `$${newBalance}`;
+};
 
+//Display total Deposite
+const displaySummary = function (account) {
+  const totalDeposites = account.movements
+    .filter(element => element > 0)
+    .reduce((acumm, value) => acumm + value);
+
+  const totalWithDrawls = account.movements
+    .filter(element => element < 0)
+    .reduce((acumm, value) => acumm + value, 0);
+
+  const totalInterest = account.movements
+    .filter(element => element > 0)
+    .map(element => (element * account.interestRate) / 100)
+    .filter(element => element >= 1)
+    .reduce((accu, value, i, arr) => accu + value, 0);
+
+  depositeTotal.innerHTML = `$${totalDeposites}`;
+  withdrawlTotal.innerHTML = `-$${Math.abs(totalWithDrawls)}`;
+  interestTotal.innerHTML = `$${totalInterest}`;
+};
+
+// Login Function
+
+createUserName(accounts);
+
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const username = inputUsername.value;
+  const password = Number(inputPassword.value);
+
+  const account =
+    accounts.find(element => element.userName === username) &&
+    accounts.find(element => element.pin === password);
+  addNewMovement([]);
+  if (account) {
+    inputUsername.value = inputPassword.value = '';
+    inputPassword.blur();
+    mainEl.classList.remove('hide');
+    footerEl.classList.remove('hide');
+    headerUserName.innerHTML = `Welcome back, ${account.owner.split(' ')[0]}!`;
+    addNewMovement(account.movements);
+    calcDisplayBalance(account.movements);
+    displaySummary(account);
+  } else {
+    mainEl.classList.add('hide');
+    footerEl.classList.add('hide');
+  }
+  console.log(account);
+});
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
@@ -71,6 +150,9 @@ const currencies = new Map([
   ['GBP', 'Pound sterling'],
 ]);
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
 /////////////////////////////////////////////////
+
+const movements = [199, 450, -400, 3000, -650, -130, 70, 1300];
+
+const account = accounts.find(element => element.owner === 'Peter Davis');
+// console.log(account);

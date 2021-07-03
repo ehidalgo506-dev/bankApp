@@ -12,18 +12,23 @@ body {
   margin: 2rem;
   font-family: 'Roboto', sans-serif;
   background-color: $main-grey;
+  // background-color: #000000;
   color: $text-color;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .main {
   width: 70%;
-  max-height: 70rem;
-  position: absolute;
-  top: 55%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  margin-top: -10rem;
+  margin-top: 5rem;
+  // max-height: 70rem;
+  // position: absolute;
+  // top: 55%;
+  // left: 50%;
+  // transform: translate(-50%, -50%);
 
   @include responsiveMax($table) {
     // margin-top: 5%;
@@ -34,7 +39,6 @@ body {
 }
 // Section 1 current Balance
 .section1 {
-  margin-top: 15rem;
   &__header {
     display: flex;
     justify-content: space-between;
@@ -91,9 +95,13 @@ body {
         font-weight: normal;
 
         & div {
-          width: 30%;
+          width: 40%;
           display: flex;
           justify-content: space-between;
+
+          & p span {
+            margin-left: 1rem;
+          }
         }
 
         &:last-child {

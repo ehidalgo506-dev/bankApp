@@ -18,23 +18,25 @@
     />
     <link rel="stylesheet" href="css/main.css" />
   </head>
-  <body>
+  <body class="">
     <!-- Header -->
     <header class="header">
-      <h3>Log in to get started</h3>
+      <h3 class="header--username">Log in to get started</h3>
       <div class="header__logo">
         <img src="logo.png" alt="Bankist Logo" />
       </div>
 
-      <div class="header__login">
-        <input type="text" placeholder="user" />
-        <input type="password" placeholder="pin" />
-        <button type="button"><i class="fas fa-arrow-right"></i></button>
-      </div>
+      <form action="" class="header__login">
+        <input type="text" placeholder="user" class="input--username" />
+        <input type="text" placeholder="pin" class="input--password" />
+        <button type="submit" class="btn--login">
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
     </header>
 
     <!-- MAIN -->
-    <main class="main">
+    <main class="main hide">
       <section class="section1">
         <article class="section1__header">
           <div class="section1__header-text">
@@ -47,50 +49,12 @@
 
       <section class="section2">
         <article class="section2__records">
-          <ul>
+          <ul class="section2__records-container">
             <li>
               <div>
-                <p class="section2__records-transactionNumber">8 deposit</p>
-                <p class="section2__records-transactionDate">02/22/2021</p>
-              </div>
-
-              <p class="section2__records-transactionAmount">$3000</p>
-            </li>
-            <li>
-              <div>
-                <p class="section2__records-transactionNumber">8 deposit</p>
-                <p class="section2__records-transactionDate">02/22/2021</p>
-              </div>
-
-              <p class="section2__records-transactionAmount">$3000</p>
-            </li>
-            <li>
-              <div>
-                <p class="section2__records-transactionNumber">8 deposit</p>
-                <p class="section2__records-transactionDate">02/22/2021</p>
-              </div>
-
-              <p class="section2__records-transactionAmount">$3000</p>
-            </li>
-            <li>
-              <div>
-                <p class="section2__records-transactionNumber">8 deposit</p>
-                <p class="section2__records-transactionDate">02/22/2021</p>
-              </div>
-
-              <p class="section2__records-transactionAmount">$3000</p>
-            </li>
-            <li>
-              <div>
-                <p class="section2__records-transactionNumber">8 deposit</p>
-                <p class="section2__records-transactionDate">02/22/2021</p>
-              </div>
-
-              <p class="section2__records-transactionAmount">$3000</p>
-            </li>
-            <li>
-              <div>
-                <p class="section2__records-transactionNumber">8 deposit</p>
+                <p class="section2__records-transactionNumber">
+                  8 <span class="movement__type">Deposit</span>
+                </p>
                 <p class="section2__records-transactionDate">02/22/2021</p>
               </div>
 
@@ -117,8 +81,8 @@
           <div class="section2__operations-div section2__operations-loan">
             <h3>Request Loan</h3>
             <div class="section2__operations">
-              <label for="input__transfer-amount">Amount</label>
-              <input type="text" id="input__transfer-amount" />
+              <label for="input__transfer-amount2">Amount</label>
+              <input type="text" id="input__transfer-amount2" />
               <button type="button"><i class="fas fa-arrow-right"></i></button>
             </div>
           </div>
@@ -127,15 +91,38 @@
           <div class="section2__operations-close section2__operations-div">
             <h3>Transfer Money</h3>
             <div>
-              <label for="input__transfer-amount">Transfer to</label>
-              <input type="text" id="input__transfer-to" />
-              <label for="input__transfer-amount">Amount</label>
-              <input type="text" id="input__transfer-amount" />
+              <label for="input__confirmUser">Confirm User</label>
+              <input type="text" id="input__confirmUser" />
+              <label for="input__confirmPin">Amount</label>
+              <input type="text" id="input__confirmPin" />
               <button type="button"><i class="fas fa-arrow-right"></i></button>
             </div>
           </div>
         </article>
       </section>
     </main>
+
+    <footer class="hide footer">
+      <section class="footer--information">
+        <p class="footer--information-p">
+          IN <span class="footer--information-in"></span>
+        </p>
+        <p class="footer--information-p">
+          OUT <span class="footer--information-out"></span>
+        </p>
+        <p class="footer--information-p">
+          INTEREST <span class="footer--information-interest"></span>
+        </p>
+        <p class="footer--information-p footer--information-p-s">
+          SORT <i class="fas fa-sort"></i
+          ><span class="footer--information-sort"></span>
+        </p>
+      </section>
+      <section class="footer--logout">
+        <p>Logout</p>
+      </section>
+    </footer>
+
+    <script src="script.js"></script>
   </body>
 </html>

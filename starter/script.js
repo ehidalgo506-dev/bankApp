@@ -6,6 +6,7 @@
 
 // Elements
 
+const allInputs = document.querySelectorAll('input');
 const mainEl = document.querySelector('.main');
 const footerEl = document.querySelector('.footer');
 const recordsContainer = document.querySelector('.section2__records-container');
@@ -18,11 +19,25 @@ const withdrawlTotal = document.querySelector('.footer--information-out');
 
 const interestTotal = document.querySelector('.footer--information-interest');
 
+// BTN and Inputs
 const btnLogin = document.querySelector('.btn--login');
 const inputUsername = document.querySelector('.input--username');
 const inputPassword = document.querySelector('.input--password');
 
+const btnTransfer = document.querySelector('.btn--transfer');
+const inputTransferTo = document.querySelector('#input__transfer-to');
+const inputAmountTransfer = document.querySelector('#input__transfer-amount');
+
+const btnLoan = document.querySelector('.btn--loan');
+const inputLoanAmount = document.querySelector('#input__transfer-amount2');
+
+const btnClose = document.querySelector('.btn--close');
+const closeUser = document.querySelector('#input__confirmUser');
+const closePin = document.querySelector('#input__confirmPin');
+
+const btnSort = document.querySelector('.footer--information-p-s');
 const headerUserName = document.querySelector('.header--username');
+
 // Data
 const account1 = {
   owner: 'Jonas Schmedtmann',
@@ -54,10 +69,18 @@ const account4 = {
 
 const accounts = [account1, account2, account3, account4];
 
+//Global Variables
+let account;
+let sorted = false;
+
 // Add New Movement to the Records
-const addNewMovement = function (movement) {
+const addNewMovement = function (account, sort = false) {
+  sorted = false;
   recordsContainer.innerHTML = '';
-  movement.forEach((element, i) => {
+
+  const sortMovements = sort ? account.slice().sort((a, b) => a - b) : account;
+
+  sortMovements.forEach((element, i) => {
     const type = element > 0 ? 'Deposit' : 'Withdrawl';
     const html = `<li>
   <div>
@@ -85,9 +108,9 @@ const createUserName = accs => {
 };
 
 // Display Total Balanace
-const calcDisplayBalance = function (movements) {
-  const newBalance = movements.reduce((acumm, value) => acumm + value);
-  mainBalance.innerHTML = `$${newBalance}`;
+const calcDisplayBalance = function (account) {
+  account.balance = account.movements.reduce((acumm, value) => acumm + value);
+  mainBalance.innerHTML = `$${account.balance}`;
 };
 
 //Display total Deposite
@@ -115,30 +138,144 @@ const displaySummary = function (account) {
 
 createUserName(accounts);
 
+const refreshInformartion = function (account) {
+  addNewMovement(account.movements, sorted);
+  calcDisplayBalance(account);
+  displaySummary(account);
+};
+
+const hideInformation = function () {
+  mainEl.classList.add('hide');
+  footerEl.classList.add('hide');
+  headerUserName.innerHTML = `Log in to get started`;
+};
+//BTN LOGIN
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
 
   const username = inputUsername.value;
   const password = Number(inputPassword.value);
 
-  const account =
+  account =
     accounts.find(element => element.userName === username) &&
     accounts.find(element => element.pin === password);
-  addNewMovement([]);
   if (account) {
     inputUsername.value = inputPassword.value = '';
     inputPassword.blur();
     mainEl.classList.remove('hide');
     footerEl.classList.remove('hide');
     headerUserName.innerHTML = `Welcome back, ${account.owner.split(' ')[0]}!`;
-    addNewMovement(account.movements);
-    calcDisplayBalance(account.movements);
-    displaySummary(account);
+    allInputs.forEach(element => (element.value = ''));
+    refreshInformartion(account);
   } else {
-    mainEl.classList.add('hide');
-    footerEl.classList.add('hide');
+    Swal.fire({
+      icon: 'warning',
+      title: 'Wrong account username',
+      text: 'Please check the username or password entered',
+    });
+    hideInformation();
   }
-  console.log(account);
+});
+
+// Transfer transaction
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+  const receiver = inputTransferTo.value;
+  const amount = Number(inputAmountTransfer.value);
+
+  const personTo = accounts.find(element => element.userName == receiver);
+
+  if (amount > 0 && personTo && personTo?.userName !== account.userName) {
+    if (account.balance >= amount) {
+      personTo.movements.push(amount);
+      account.movements.push(-amount);
+      account.balance -= amount;
+      Swal.fire({
+        icon: 'success',
+        title: 'Yeiii...',
+        text: 'Transfer successful!',
+        footer: '<a href="">Why do I have this issue?</a>',
+      });
+      refreshInformartion(account);
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: 'Not enough credits',
+        footer: '<a href="">Why do I have this issue?</a>',
+      });
+    }
+  } else {
+    console.log(`Incorrect Username or amount inserted`);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Username or amount incorrect',
+      footer: '<a href="">Why do I have this issue?</a>',
+    });
+  }
+  inputUsername.value = inputPassword.value = '';
+});
+
+//BTN CLOSE
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const username = closeUser.value;
+  const pin = Number(closePin.value);
+
+  if (username === account.userName && pin === account.pin) {
+    console.log(username);
+    const userIndex = accounts.findIndex(u => u.userName === username);
+    if (
+      confirm(
+        'You are about to permantely delete your account. Are you sure you want to continue?'
+      )
+    ) {
+      accounts.splice(userIndex, 1);
+      hideInformation();
+    } else {
+    }
+  } else {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Wrong account username',
+      text: 'Please check the username or password entered',
+    });
+  }
+});
+
+//BTN LOAN
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const amount = Number(inputLoanAmount.value);
+
+  const canRequest = account.movements.some(element => element >= amount * 0.1);
+
+  if (canRequest && amount > 0) {
+    account.movements.push(amount);
+    refreshInformartion(account);
+    Swal.fire({
+      icon: 'success',
+      title: 'Yeiii...',
+      text: 'Loan successful approved! You should be able to see it in your account soon',
+      footer: '<a href="">Why do I have this issue?</a>',
+    });
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Not possible',
+      text: `Sorry with your current history we can't loan you this quantity of money`,
+    });
+  }
+});
+
+// SORT ARRAYS
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+  sorted = sorted ? (sorted = false) : (sorted = true);
+  addNewMovement(account.movements, sorted);
 });
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -152,7 +289,11 @@ const currencies = new Map([
 
 /////////////////////////////////////////////////
 
+//NUMBERS
 const movements = [199, 450, -400, 3000, -650, -130, 70, 1300];
 
-const account = accounts.find(element => element.owner === 'Peter Davis');
-// console.log(account);
+const randomDiceRolls = Array.from({ length: 100 }, () =>
+  Math.floor(Math.random() * 6 + 1)
+);
+
+console.log(randomDiceRolls);

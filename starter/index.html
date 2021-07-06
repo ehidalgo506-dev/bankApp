@@ -28,7 +28,7 @@
 
       <form action="" class="header__login">
         <input type="text" placeholder="user" class="input--username" />
-        <input type="text" placeholder="pin" class="input--password" />
+        <input type="password" placeholder="pin" class="input--password" />
         <button type="submit" class="btn--login">
           <i class="fas fa-arrow-right"></i>
         </button>
@@ -72,8 +72,10 @@
               <label for="input__transfer-amount">Transfer to</label>
               <input type="text" id="input__transfer-to" />
               <label for="input__transfer-amount">Amount</label>
-              <input type="text" id="input__transfer-amount" />
-              <button type="button"><i class="fas fa-arrow-right"></i></button>
+              <input type="number" id="input__transfer-amount" />
+              <button type="submit" class="btn--transfer">
+                <i class="fas fa-arrow-right"></i>
+              </button>
             </div>
           </div>
 
@@ -82,20 +84,24 @@
             <h3>Request Loan</h3>
             <div class="section2__operations">
               <label for="input__transfer-amount2">Amount</label>
-              <input type="text" id="input__transfer-amount2" />
-              <button type="button"><i class="fas fa-arrow-right"></i></button>
+              <input type="number" id="input__transfer-amount2" />
+              <button type="submit" class="btn--loan">
+                <i class="fas fa-arrow-right"></i>
+              </button>
             </div>
           </div>
 
           <!-- Close account -->
           <div class="section2__operations-close section2__operations-div">
-            <h3>Transfer Money</h3>
+            <h3>Close Account</h3>
             <div>
               <label for="input__confirmUser">Confirm User</label>
               <input type="text" id="input__confirmUser" />
-              <label for="input__confirmPin">Amount</label>
-              <input type="text" id="input__confirmPin" />
-              <button type="button"><i class="fas fa-arrow-right"></i></button>
+              <label for="input__confirmPin">PIN</label>
+              <input type="password" id="input__confirmPin" />
+              <button type="submit" class="btn--close">
+                <i class="fas fa-arrow-right"></i>
+              </button>
             </div>
           </div>
         </article>
@@ -122,7 +128,7 @@
         <p>Logout</p>
       </section>
     </footer>
-
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="script.js"></script>
   </body>
 </html>

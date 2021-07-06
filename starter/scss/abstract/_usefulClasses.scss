@@ -12,5 +12,6 @@
 }
 
 .hide {
-  display: none !important;
+  opacity: 0 !important;
+  transition: all 0.25s;
 }

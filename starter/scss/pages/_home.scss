@@ -24,6 +24,7 @@ body {
 .main {
   width: 70%;
   margin-top: 5rem;
+  transition: all 0.35s;
   // max-height: 70rem;
   // position: absolute;
   // top: 55%;
@@ -81,7 +82,7 @@ body {
     & ul {
       box-shadow: 1px 1px 30px rgba($color: #000000, $alpha: 0.2);
       max-height: 40rem;
-      overflow: scroll;
+      overflow-y: scroll;
       background-color: white;
 
       & li {
@@ -163,16 +164,10 @@ body {
 
       &:nth-child(3) {
         background: #74ebd5; /* fallback for old browsers */
-        background: -webkit-linear-gradient(
-          to right,
-          #acb6e5,
-          #74ebd5
-        ); /* Chrome 10-25, Safari 5.1-6 */
-        background: linear-gradient(
-          to right,
-          #acb6e5,
-          #74ebd5
-        ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        background-color: #bc0c0c;
+        background-image: linear-gradient(90deg, #bc0c0c 0%, #b44d4e 100%);
+
+        /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
       }
 
       & h3 {

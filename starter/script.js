@@ -286,14 +286,3 @@ const currencies = new Map([
   ['EUR', 'Euro'],
   ['GBP', 'Pound sterling'],
 ]);
-
-/////////////////////////////////////////////////
-
-//NUMBERS
-const movements = [199, 450, -400, 3000, -650, -130, 70, 1300];
-
-const randomDiceRolls = Array.from({ length: 100 }, () =>
-  Math.floor(Math.random() * 6 + 1)
-);
-
-console.log(randomDiceRolls);

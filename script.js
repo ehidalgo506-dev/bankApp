@@ -40,10 +40,22 @@ const headerUserName = document.querySelector('.header--username');
 
 // Data
 const account1 = {
-  owner: 'Jonas Schmedtmann',
+  owner: 'Esteban Hidalgo',
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
+  movementsDates: [
+    '2019-11-18T21:31:17.178Z',
+    '2019-12-23T07:42:02.383Z',
+    '2020-01-28T09:15:04.904Z',
+    '2020-04-01T10:17:24.185Z',
+    '2020-05-08T14:11:59.604Z',
+    '2020-05-27T17:01:17.194Z',
+    '2020-07-11T23:36:17.929Z',
+    '2020-07-12T10:51:36.790Z',
+  ],
+  currency: 'EUR',
+  locale: 'pt-PT', // de-DE
 };
 
 const account2 = {
@@ -51,6 +63,18 @@ const account2 = {
   movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
   interestRate: 1.5,
   pin: 2222,
+  movementsDates: [
+    '2019-11-01T13:15:33.035Z',
+    '2019-11-30T09:48:16.867Z',
+    '2019-12-25T06:04:23.907Z',
+    '2020-01-25T14:18:46.235Z',
+    '2020-02-05T16:33:06.386Z',
+    '2020-04-10T14:43:26.374Z',
+    '2020-06-25T18:49:59.371Z',
+    '2020-07-26T12:01:20.894Z',
+  ],
+  currency: 'USD',
+  locale: 'en-US',
 };
 
 const account3 = {
@@ -75,7 +99,6 @@ let sorted = false;
 
 // Add New Movement to the Records
 const addNewMovement = function (account, sort = false) {
-  sorted = false;
   recordsContainer.innerHTML = '';
 
   const sortMovements = sort ? account.slice().sort((a, b) => a - b) : account;
@@ -90,7 +113,7 @@ const addNewMovement = function (account, sort = false) {
     <p class="section2__records-transactionDate">02/22/2021</p>
   </div>
 
-  <p class="section2__records-transactionAmount">$${element}</p>
+  <p class="section2__records-transactionAmount">$${element.toFixed(2)}</p>
 </li>`;
     recordsContainer.insertAdjacentHTML('afterbegin', html);
   });
@@ -110,10 +133,10 @@ const createUserName = accs => {
 // Display Total Balanace
 const calcDisplayBalance = function (account) {
   account.balance = account.movements.reduce((acumm, value) => acumm + value);
-  mainBalance.innerHTML = `$${account.balance}`;
+  mainBalance.innerHTML = `$${account.balance.toFixed(2)}`;
 };
 
-//Display total Deposite
+//Display total Summary
 const displaySummary = function (account) {
   const totalDeposites = account.movements
     .filter(element => element > 0)
@@ -129,9 +152,9 @@ const displaySummary = function (account) {
     .filter(element => element >= 1)
     .reduce((accu, value, i, arr) => accu + value, 0);
 
-  depositeTotal.innerHTML = `$${totalDeposites}`;
-  withdrawlTotal.innerHTML = `-$${Math.abs(totalWithDrawls)}`;
-  interestTotal.innerHTML = `$${totalInterest}`;
+  depositeTotal.innerHTML = `$${totalDeposites.toFixed(2)}`;
+  withdrawlTotal.innerHTML = `-$${totalWithDrawls.toFixed(2)}`;
+  interestTotal.innerHTML = `$${totalInterest.toFixed(2)}`;
 };
 
 // Login Function
@@ -249,7 +272,7 @@ btnClose.addEventListener('click', function (e) {
 btnLoan.addEventListener('click', function (e) {
   e.preventDefault();
 
-  const amount = Number(inputLoanAmount.value);
+  const amount = Math.floor(inputLoanAmount.value);
 
   const canRequest = account.movements.some(element => element >= amount * 0.1);
 
@@ -280,6 +303,8 @@ btnSort.addEventListener('click', function (e) {
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
+
+//random values between max and min numbers
 
 const currencies = new Map([
   ['USD', 'United States dollar'],

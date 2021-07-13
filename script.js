@@ -9,7 +9,11 @@
 const allInputs = document.querySelectorAll('input');
 const mainEl = document.querySelector('.main');
 const footerEl = document.querySelector('.footer');
+
+const dateEl = document.querySelector('.section1__header-text-date');
+
 const recordsContainer = document.querySelector('.section2__records-container');
+const movRows = document.querySelectorAll('.section2__records-row');
 
 const mainBalance = document.querySelector('.section1__header-mainBalance');
 
@@ -82,6 +86,18 @@ const account3 = {
   movements: [200, -200, 340, -300, -20, 50, 400, -460],
   interestRate: 0.7,
   pin: 3333,
+  movementsDates: [
+    '2019-11-01T13:15:33.035Z',
+    '2019-11-30T09:48:16.867Z',
+    '2019-12-25T06:04:23.907Z',
+    '2020-01-25T14:18:46.235Z',
+    '2020-02-05T16:33:06.386Z',
+    '2020-04-10T14:43:26.374Z',
+    '2020-06-25T18:49:59.371Z',
+    '2020-07-26T12:01:20.894Z',
+  ],
+  currency: 'USD',
+  locale: 'en-US',
 };
 
 const account4 = {
@@ -89,6 +105,18 @@ const account4 = {
   movements: [430, 1000, 700, 50, 90],
   interestRate: 1,
   pin: 4444,
+  movementsDates: [
+    '2019-11-01T13:15:33.035Z',
+    '2019-11-30T09:48:16.867Z',
+    '2019-12-25T06:04:23.907Z',
+    '2020-01-25T14:18:46.235Z',
+    '2020-02-05T16:33:06.386Z',
+    '2020-04-10T14:43:26.374Z',
+    '2020-06-25T18:49:59.371Z',
+    '2020-07-26T12:01:20.894Z',
+  ],
+  currency: 'USD',
+  locale: 'en-US',
 };
 
 const accounts = [account1, account2, account3, account4];
@@ -97,26 +125,66 @@ const accounts = [account1, account2, account3, account4];
 let account;
 let sorted = false;
 
+const todayDate = function () {
+  const nDate = new Date();
+  const year = nDate.getFullYear();
+  const month = `${nDate.getMonth() + 1}`.padStart(2, 0);
+  const day = `${nDate.getDate()}`.padStart(2, 0);
+  const hour = `${nDate.getHours()}`.padStart(2, 0);
+  const minutes = `${nDate.getMinutes()}`.padStart(2, 0);
+
+  dateEl.innerHTML = `As of ${day}/${month}/${year}, ${hour}: ${minutes}`;
+};
+
+todayDate();
 // Add New Movement to the Records
 const addNewMovement = function (account, sort = false) {
   recordsContainer.innerHTML = '';
 
-  const sortMovements = sort ? account.slice().sort((a, b) => a - b) : account;
+  const sortMovements = sort
+    ? account.movements.slice().sort((a, b) => a - b)
+    : account.movements;
 
   sortMovements.forEach((element, i) => {
+    const nDate = new Date(account.movementsDates[i]);
+    const year = nDate.getFullYear();
+    const month = `${nDate.getMonth() + 1}`.padStart(2, 0);
+    const day = `${nDate.getDate()}`.padStart(2, 0);
     const type = element > 0 ? 'Deposit' : 'Withdrawl';
-    const html = `<li>
+    const dayDiference = (date1, date2) => {
+      const d = Math.abs(date1 - date2) / (1000 * 60 * 60 * 24);
+      if (d === 0) {
+        return `Today`;
+      } else if (d == 1) {
+        return `yesterday`;
+      } else if (d > 1) {
+        return `${d} days ago`;
+      }
+    };
+    const html = `<li class="section2__records-row">
   <div>
     <p class="section2__records-transactionNumber">${
       i + 1
     } <span class="movement__type movement__type-${type}">${type}</span></p>
-    <p class="section2__records-transactionDate">02/22/2021</p>
+    <p class="section2__records-transactionDate">${day}/${month}/${year}</p>
   </div>
 
   <p class="section2__records-transactionAmount">$${element.toFixed(2)}</p>
 </li>`;
     recordsContainer.insertAdjacentHTML('afterbegin', html);
   });
+  colorMovements();
+};
+
+// Color even movements
+const colorMovements = function () {
+  [...document.querySelectorAll('.section2__records-row')].forEach(
+    (element, i) => {
+      if (i % 2 === 0) {
+        element.style.backgroundColor = '#dfe6e9';
+      }
+    }
+  );
 };
 
 // Create Usernames
@@ -162,7 +230,7 @@ const displaySummary = function (account) {
 createUserName(accounts);
 
 const refreshInformartion = function (account) {
-  addNewMovement(account.movements, sorted);
+  addNewMovement(account, sorted);
   calcDisplayBalance(account);
   displaySummary(account);
 };
@@ -211,7 +279,9 @@ btnTransfer.addEventListener('click', function (e) {
   if (amount > 0 && personTo && personTo?.userName !== account.userName) {
     if (account.balance >= amount) {
       personTo.movements.push(amount);
+      personTo.movementsDates.push(new Date().toISOString());
       account.movements.push(-amount);
+      account.movementsDates.push(new Date().toISOString());
       account.balance -= amount;
       Swal.fire({
         icon: 'success',
@@ -278,6 +348,7 @@ btnLoan.addEventListener('click', function (e) {
 
   if (canRequest && amount > 0) {
     account.movements.push(amount);
+    account.movementsDates.push(new Date().toISOString());
     refreshInformartion(account);
     Swal.fire({
       icon: 'success',
@@ -298,7 +369,7 @@ btnLoan.addEventListener('click', function (e) {
 btnSort.addEventListener('click', function (e) {
   e.preventDefault();
   sorted = sorted ? (sorted = false) : (sorted = true);
-  addNewMovement(account.movements, sorted);
+  addNewMovement(account, sorted);
 });
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////

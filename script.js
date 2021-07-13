@@ -45,7 +45,7 @@ const headerUserName = document.querySelector('.header--username');
 // Data
 const account1 = {
   owner: 'Esteban Hidalgo',
-  movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
+  movements: [200, 450, -400, 3000, -650, -130, 70, 1300, 4000, -30],
   interestRate: 1.2, // %
   pin: 1111,
   movementsDates: [
@@ -57,9 +57,11 @@ const account1 = {
     '2020-05-27T17:01:17.194Z',
     '2020-07-11T23:36:17.929Z',
     '2020-07-12T10:51:36.790Z',
+    '2021-07-10T12:01:20.894Z',
+    '2021-07-11T06:00:00.000Z',
   ],
   currency: 'EUR',
-  locale: 'pt-PT', // de-DE
+  locale: 'es-MX', // de-DE
 };
 
 const account2 = {
@@ -125,18 +127,46 @@ const accounts = [account1, account2, account3, account4];
 let account;
 let sorted = false;
 
-const todayDate = function () {
-  const nDate = new Date();
-  const year = nDate.getFullYear();
-  const month = `${nDate.getMonth() + 1}`.padStart(2, 0);
-  const day = `${nDate.getDate()}`.padStart(2, 0);
-  const hour = `${nDate.getHours()}`.padStart(2, 0);
-  const minutes = `${nDate.getMinutes()}`.padStart(2, 0);
+const todayDate = function (account) {
+  const today = new Date();
 
-  dateEl.innerHTML = `As of ${day}/${month}/${year}, ${hour}: ${minutes}`;
+  const options = {
+    //options are: numeric, long, 2-digit, narrow, short
+    hour: 'numeric',
+    minute: 'numeric',
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    // weekday: 'long',
+  };
+
+  const userFormat = new Intl.DateTimeFormat(account.locale, options).format(
+    today
+  ); //Monday, July 12, 2021, 7:43 PM
+  dateEl.innerHTML = `As of ${userFormat}`;
 };
 
-todayDate();
+//Calculate days between 2 dates
+const dayDiference = (date1, locale) => {
+  // const year = date1.getFullYear();
+  // const month = `${date1.getMonth() + 1}`.padStart(2, 0);
+  // const day = `${date1.getDate()}`.padStart(2, 0);
+  const d = Math.floor(Math.abs(new Date() - date1) / (1000 * 60 * 60 * 24));
+  if (d === 0) {
+    console.log(d);
+    return `Today`;
+  } else if (d == 1) {
+    console.log(d);
+    return `Yesterday`;
+  } else if (d > 1 && d <= 3) {
+    console.log(d);
+    return `${d} days ago`;
+  } else {
+    console.log(d);
+    return new Intl.DateTimeFormat(locale).format(date1);
+  }
+};
+
 // Add New Movement to the Records
 const addNewMovement = function (account, sort = false) {
   recordsContainer.innerHTML = '';
@@ -147,26 +177,17 @@ const addNewMovement = function (account, sort = false) {
 
   sortMovements.forEach((element, i) => {
     const nDate = new Date(account.movementsDates[i]);
-    const year = nDate.getFullYear();
-    const month = `${nDate.getMonth() + 1}`.padStart(2, 0);
-    const day = `${nDate.getDate()}`.padStart(2, 0);
     const type = element > 0 ? 'Deposit' : 'Withdrawl';
-    const dayDiference = (date1, date2) => {
-      const d = Math.abs(date1 - date2) / (1000 * 60 * 60 * 24);
-      if (d === 0) {
-        return `Today`;
-      } else if (d == 1) {
-        return `yesterday`;
-      } else if (d > 1) {
-        return `${d} days ago`;
-      }
-    };
+
     const html = `<li class="section2__records-row">
   <div>
     <p class="section2__records-transactionNumber">${
       i + 1
     } <span class="movement__type movement__type-${type}">${type}</span></p>
-    <p class="section2__records-transactionDate">${day}/${month}/${year}</p>
+    <p class="section2__records-transactionDate">${dayDiference(
+      nDate,
+      account.locale
+    )}</p>
   </div>
 
   <p class="section2__records-transactionAmount">$${element.toFixed(2)}</p>
@@ -257,6 +278,7 @@ btnLogin.addEventListener('click', function (e) {
     footerEl.classList.remove('hide');
     headerUserName.innerHTML = `Welcome back, ${account.owner.split(' ')[0]}!`;
     allInputs.forEach(element => (element.value = ''));
+    todayDate(account);
     refreshInformartion(account);
   } else {
     Swal.fire({

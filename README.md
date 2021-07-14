@@ -15,3 +15,7 @@ The users and the movements are dynamically added and the dates and timers will 
 When transferring the money just log in as that user to see his / her profile.
 
 The user will be automatically logged out if there isn't any movement in 5min.
+
+Notes:
+-Functionality should be working 100%
+- There are some minors design details that will be fixed soon.

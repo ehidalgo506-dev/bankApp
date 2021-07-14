@@ -9,6 +9,7 @@
 const allInputs = document.querySelectorAll('input');
 const mainEl = document.querySelector('.main');
 const footerEl = document.querySelector('.footer');
+const footerTimer = document.querySelector('.footer--logout-timer');
 
 const dateEl = document.querySelector('.section1__header-text-date');
 
@@ -60,8 +61,8 @@ const account1 = {
     '2021-07-10T12:01:20.894Z',
     '2021-07-11T06:00:00.000Z',
   ],
-  currency: 'EUR',
-  locale: 'es-MX', // de-DE
+  currency: 'USD',
+  locale: 'en-US', // de-DE
 };
 
 const account2 = {
@@ -98,8 +99,8 @@ const account3 = {
     '2020-06-25T18:49:59.371Z',
     '2020-07-26T12:01:20.894Z',
   ],
-  currency: 'USD',
-  locale: 'en-US',
+  currency: 'EUR',
+  locale: 'de-DE',
 };
 
 const account4 = {
@@ -124,7 +125,7 @@ const account4 = {
 const accounts = [account1, account2, account3, account4];
 
 //Global Variables
-let account;
+let account, timer;
 let sorted = false;
 
 const todayDate = function (account) {
@@ -134,6 +135,7 @@ const todayDate = function (account) {
     //options are: numeric, long, 2-digit, narrow, short
     hour: 'numeric',
     minute: 'numeric',
+    second: 'numeric',
     day: 'numeric',
     month: 'numeric',
     year: 'numeric',
@@ -144,6 +146,41 @@ const todayDate = function (account) {
     today
   ); //Monday, July 12, 2021, 7:43 PM
   dateEl.innerHTML = `As of ${userFormat}`;
+};
+
+//Timer
+const timerBackwards = function () {
+  let time = 300; //amount of seconds that we want run the timer 120 -> 2min
+
+  const tick = function () {
+    // we need to create a tick function to call it inmediately otherwise the timer will start 1 sec later after the login
+    let minutes = `${Math.trunc(time / 60)}`.padStart(0, 2);
+    let seconds = `${time % 60}`.padStart(2, 0);
+    if (time === 0) {
+      footerTimer.innerHTML = `${minutes}:${seconds}`;
+      mainEl.classList.add('hide');
+      footerEl.classList.add('hide');
+      account = '';
+      clearInterval(timer);
+    } else {
+      console.log(time);
+      footerTimer.innerHTML = `${minutes}:${seconds}`;
+      time--;
+    }
+  };
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer;
+};
+
+const intlMoney = function (locale, currency, number) {
+  const options = {
+    style: 'currency',
+    currency: currency,
+  };
+
+  const num = new Intl.NumberFormat(locale, options).format(number);
+  return num;
 };
 
 //Calculate days between 2 dates
@@ -190,7 +227,11 @@ const addNewMovement = function (account, sort = false) {
     )}</p>
   </div>
 
-  <p class="section2__records-transactionAmount">$${element.toFixed(2)}</p>
+  <p class="section2__records-transactionAmount">${intlMoney(
+    account.local,
+    account.currency,
+    element
+  )}</p>
 </li>`;
     recordsContainer.insertAdjacentHTML('afterbegin', html);
   });
@@ -222,7 +263,11 @@ const createUserName = accs => {
 // Display Total Balanace
 const calcDisplayBalance = function (account) {
   account.balance = account.movements.reduce((acumm, value) => acumm + value);
-  mainBalance.innerHTML = `$${account.balance.toFixed(2)}`;
+  mainBalance.innerHTML = `${intlMoney(
+    account.locale,
+    account.currency,
+    account.balance
+  )}`;
 };
 
 //Display total Summary
@@ -241,9 +286,21 @@ const displaySummary = function (account) {
     .filter(element => element >= 1)
     .reduce((accu, value, i, arr) => accu + value, 0);
 
-  depositeTotal.innerHTML = `$${totalDeposites.toFixed(2)}`;
-  withdrawlTotal.innerHTML = `-$${totalWithDrawls.toFixed(2)}`;
-  interestTotal.innerHTML = `$${totalInterest.toFixed(2)}`;
+  depositeTotal.innerHTML = `${intlMoney(
+    account.locale,
+    account.currency,
+    totalDeposites
+  )}`;
+  withdrawlTotal.innerHTML = `${intlMoney(
+    account.locale,
+    account.currency,
+    totalWithDrawls
+  )}`;
+  interestTotal.innerHTML = `${intlMoney(
+    account.locale,
+    account.currency,
+    totalInterest
+  )}`;
 };
 
 // Login Function
@@ -279,6 +336,11 @@ btnLogin.addEventListener('click', function (e) {
     headerUserName.innerHTML = `Welcome back, ${account.owner.split(' ')[0]}!`;
     allInputs.forEach(element => (element.value = ''));
     todayDate(account);
+
+    if (timer) clearTimeout(timer);
+    timer = timerBackwards();
+
+    todayDate(account);
     refreshInformartion(account);
   } else {
     Swal.fire({
@@ -293,6 +355,8 @@ btnLogin.addEventListener('click', function (e) {
 // Transfer transaction
 btnTransfer.addEventListener('click', function (e) {
   e.preventDefault();
+  if (timer) clearInterval(timer);
+  timer = timerBackwards();
   const receiver = inputTransferTo.value;
   const amount = Number(inputAmountTransfer.value);
 
@@ -312,6 +376,8 @@ btnTransfer.addEventListener('click', function (e) {
         footer: '<a href="">Why do I have this issue?</a>',
       });
       refreshInformartion(account);
+      if (timer) clearInterval(timer);
+      timer = timerBackwards();
     } else {
       Swal.fire({
         icon: 'warning',
@@ -363,15 +429,19 @@ btnClose.addEventListener('click', function (e) {
 //BTN LOAN
 btnLoan.addEventListener('click', function (e) {
   e.preventDefault();
+  if (timer) clearInterval(timer);
+  timer = timerBackwards();
 
   const amount = Math.floor(inputLoanAmount.value);
 
   const canRequest = account.movements.some(element => element >= amount * 0.1);
 
   if (canRequest && amount > 0) {
-    account.movements.push(amount);
-    account.movementsDates.push(new Date().toISOString());
-    refreshInformartion(account);
+    setTimeout(() => {
+      account.movements.push(amount);
+      account.movementsDates.push(new Date().toISOString());
+      refreshInformartion(account);
+    }, 3000);
     Swal.fire({
       icon: 'success',
       title: 'Yeiii...',
@@ -404,3 +474,5 @@ const currencies = new Map([
   ['EUR', 'Euro'],
   ['GBP', 'Pound sterling'],
 ]);
+
+//setImeInterval
